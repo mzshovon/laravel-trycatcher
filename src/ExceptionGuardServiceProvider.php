@@ -26,7 +26,7 @@ class ExceptionGuardServiceProvider extends ServiceProvider
             __DIR__.'/config/exception-guard.php' => config_path('exception-guard.php'),
         ], 'config');
 
-        $this->publishesMigrations([__DIR__.'Migrations/' => database_path('migrations')], 'migrations');
+        $this->publishes([__DIR__.'Migrations/' => database_path('migrations')], 'migrations');
 
         // load helpers
         if (file_exists(__DIR__ . '/Helpers/helpers.php')) {
