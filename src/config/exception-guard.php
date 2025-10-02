@@ -8,4 +8,5 @@ return [
         'sentry' => env('SENTRY_DSN') ? true : false,
         'slack' => env('EXCEPTION_GUARD_SLACK_WEBHOOK') ? true : false,
     ],
+    'safe_prod_guard' => 1
 ];

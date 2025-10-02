@@ -23,11 +23,12 @@ trait Guardable
             /** @var ExceptionPolicyAttr $attr */
             $attr = $attributes[0]->newInstance();
             $policy = $attr->policy;
+            $options =  $attr->options;
 
             try {
                 return $ref->invokeArgs($this, $arguments);
             } catch (\Throwable $e) {
-                return ExceptionHandler::handle($e, $policy);
+                return ExceptionHandler::handle($e, $policy, $options);
             }
         }
 

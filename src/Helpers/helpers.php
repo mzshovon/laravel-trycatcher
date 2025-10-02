@@ -47,4 +47,14 @@ if (! function_exists('guarded')) {
 
         return $guard->run(fn() => is_array($callable) ? $callable[0]->{$callable[1]}(...($options['__args'] ?? [])) : ($callable instanceof Closure ? $callable() : $callable()), $policy, $options);
     }
+
+    if (! function_exists('isProdEnv')) {
+        /**
+         * @return bool
+         */
+        function isProdEnv() : bool
+        {
+            return config('app.env') == "production";
+        }
+    }
 }

@@ -68,6 +68,11 @@ class PolicyHandler {
 
     protected function formatExceptionForReturn(\Throwable $ex, array $options, bool $withTrace)
     {
+        // Check for safe guard for production
+        $safeProdGuardEnabled = config('exception-guard.safe_prod_guard');
+        if($safeProdGuardEnabled && isProdEnv()) {
+            return $this->safeResponse($options);
+        }
         // You can shape response structure used across app (for API)
         $payload = [
             'error' => true,
