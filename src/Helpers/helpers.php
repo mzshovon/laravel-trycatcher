@@ -1,7 +1,7 @@
 <?php
 
-use  Mzshovon\LaravelTryCatcher\Services\ExceptionGuard;
-use  Mzshovon\LaravelTryCatcher\Attributes\ExceptionPolicyAttr;
+use Mzshovon\LaravelTryCatcher\Services\ExceptionGuard;
+use Mzshovon\LaravelTryCatcher\Attributes\ExceptionPolicyAttr;
 
 if (! function_exists('guarded')) {
     /**
@@ -45,7 +45,30 @@ if (! function_exists('guarded')) {
         // Default policy from config
         $policy = $policy ?? config('exception-guard.default_policy');
 
-        return $guard->run(fn() => is_array($callable) ? $callable[0]->{$callable[1]}(...($options['__args'] ?? [])) : ($callable instanceof Closure ? $callable() : $callable()), $policy, $options);
+        return $guard->run(function () use ($callable, $options) {
+            if (is_array($callable)) {
+                [$classOrObject, $method] = $callable;
+
+                // Static call if first element is string
+                if (is_string($classOrObject)) {
+                    return $classOrObject::$method(...($options['__args'] ?? []));
+                }
+
+                // Instance method call
+                return $classOrObject->{$method}(...($options['__args'] ?? []));
+            }
+
+            if ($callable instanceof \Closure) {
+                return $callable();
+            }
+
+            // If it's directly callable, invoke it
+            if (is_callable($callable)) {
+                return $callable(...($options['__args'] ?? []));
+            }
+
+            throw new \InvalidArgumentException('Invalid callable passed to guarded()');
+        }, $policy, $options);
     }
 
     if (! function_exists('isProdEnv')) {

@@ -7,6 +7,11 @@ use Mzshovon\LaravelTryCatcher\Services\ExceptionGuard;
 
 class ExceptionGuardServiceProvider extends ServiceProvider
 {
+    /**
+     * Register the service provider.
+     *
+     * @return void
+     */
     public function register()
     {
         $this->mergeConfigFrom(__DIR__ . '/config/exception-guard.php', 'exception-guard');
@@ -19,6 +24,11 @@ class ExceptionGuardServiceProvider extends ServiceProvider
         $this->app->alias(ExceptionGuard::class, 'exception-guard');
     }
 
+    /**
+     * Bootstrap the service provider.
+     *
+     * @return void
+     */
     public function boot()
     {
         // publish config and migrations

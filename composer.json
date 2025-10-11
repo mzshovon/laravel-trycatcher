@@ -8,17 +8,23 @@
             "Mzshovon\\LaravelTryCatcher\\": "src/"
         }
     },
+    "autoload-dev": {
+        "psr-4": {
+            "Mzshovon\\LaravelTryCatcher\\Tests\\": "tests/"
+        }
+    },
     "authors": [
         {
             "name": "Zaman Shovon",
             "email": "zaman.monir20188@gmail.com"
         }
     ],
-        "require": {
+    "require": {
         "php": ">=8.0"
     },
     "require-dev": {
-        "phpunit/phpunit": "^9.0"
+        "phpunit/phpunit": "^9.0",
+        "orchestra/testbench": "8.x-dev"
     },
     "minimum-stability": "dev",
     "extra": {

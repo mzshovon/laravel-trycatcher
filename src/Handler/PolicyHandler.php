@@ -7,12 +7,22 @@ use Mzshovon\LaravelTryCatcher\Models\ErrorLog;
 use Mzshovon\LaravelTryCatcher\Policies\ExceptionPolicy;
 use Symfony\Component\HttpFoundation\Response;
 
+/**
+ * @property \Throwable $ex
+ * @property ExceptionPolicy $policy
+ * @property array $options
+ */
 class PolicyHandler {
 
     protected ?\Throwable $ex;
     protected ?ExceptionPolicy $policy;
     protected array $options = [];
 
+    /**
+     * @param \Throwable $ex
+     * @param ExceptionPolicy $policy
+     * @param array $options
+     */
     public function __construct(
         \Throwable $ex,
         ExceptionPolicy $policy,
@@ -23,6 +33,9 @@ class PolicyHandler {
         $this->options = $options;
     }
 
+    /**
+     * @return mixed
+     */
     public function resolvePolicy()
     {
         switch ($this->policy) {
@@ -47,6 +60,13 @@ class PolicyHandler {
         }
     }
 
+    /**
+     * @param \Throwable $ex
+     * @param bool $withTrace
+     * @param array $options
+     *
+     * @return void
+     */
     protected function logException(\Throwable $ex, bool $withTrace = true, array $options = []): void
     {
         try {
@@ -66,6 +86,13 @@ class PolicyHandler {
         Log::error($logMsg, $options['context'] ?? []);
     }
 
+    /**
+     * @param \Throwable $ex
+     * @param array $options
+     * @param bool $withTrace
+     *
+     * @return JsonResponse
+     */
     protected function formatExceptionForReturn(\Throwable $ex, array $options, bool $withTrace)
     {
         // Check for safe guard for production
@@ -84,6 +111,11 @@ class PolicyHandler {
         return response()->json($payload, $options['status'] ?? Response::HTTP_INTERNAL_SERVER_ERROR);
     }
 
+    /**
+     * @param array $options
+     *
+     * @return JsonResponse
+     */
     protected function safeResponse(array $options)
     {
         return response()->json([

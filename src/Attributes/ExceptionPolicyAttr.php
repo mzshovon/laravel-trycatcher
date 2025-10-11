@@ -8,5 +8,14 @@ use Mzshovon\LaravelTryCatcher\Policies\ExceptionPolicy;
 #[Attribute(Attribute::TARGET_METHOD)]
 class ExceptionPolicyAttr
 {
-    public function __construct(public ExceptionPolicy $policy, public array $options = []) {}
+    /**
+     * @param  public ExceptionPolicy $policy
+     * @param public array $options
+     * @param public bool $shouldThrow
+     */
+    public function __construct(
+        public ExceptionPolicy $policy,
+        public array $options = [],
+        public bool $shouldThrow = false,
+    ) {}
 }
