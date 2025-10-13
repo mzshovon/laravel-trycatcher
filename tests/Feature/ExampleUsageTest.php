@@ -30,6 +30,8 @@ class ExampleUsageTest extends TestCase
         $this->assertDatabaseHas('error_logs', [
             'message' => 'Something went wrong'
         ]);
+
+        ErrorLog::whereMessage("Something went wrong")->delete();
     }
 
     /**
@@ -82,6 +84,8 @@ class ExampleUsageTest extends TestCase
             'message' => 'Test log entry',
             'level' => 'info'
         ]);
+
+        ErrorLog::whereMessage("Test log entry")->delete();
     }
 
     /**
@@ -115,6 +119,8 @@ class ExampleUsageTest extends TestCase
         $this->assertTrue($data->error);
         $this->assertEquals('An error occurred. Please try again.', $data->message);
         $this->assertStringNotContainsString('Sensitive error information', $data->message);
+
+        ErrorLog::whereMessage("Sensitive error information")->delete();
     }
 
     /**
@@ -147,6 +153,8 @@ class ExampleUsageTest extends TestCase
         $this->assertEquals('warning', $errorLog->level);
         $this->assertEquals($userId, $errorLog->context['user_id']);
         $this->assertEquals($action, $errorLog->context['action']);
+
+        ErrorLog::whereMessage("Login failed")->delete();
     }
 
     /**
@@ -177,8 +185,13 @@ class ExampleUsageTest extends TestCase
             if ($policy !== ExceptionPolicy::THROW && $policy !== ExceptionPolicy::LOG_AND_THROW) {
                 $this->assertInstanceOf(Response::class, $result);
                 $this->assertTrue($result->getData()->error);
+                ErrorLog::where("message","like","%Test with%")->delete();
+            } else {
+                ErrorLog::where("message","like","%Test with%")->delete();
             }
         }
+
+
     }
 
     /**

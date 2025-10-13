@@ -62,17 +62,19 @@ class ExceptionGuardTest extends TestCase
     public function test_guard_handles_exception_with_log_with_trace_policy()
     {
         $result = $this->guard->run(
-            fn() => throw new Exception('Test exception'),
+            fn() => throw new Exception('Test guard handle log trace exception'),
             ExceptionPolicy::LOG_WITH_TRACE
         );
 
         $this->assertInstanceOf(Response::class, $result);
         $this->assertTrue($result->getData()->error);
-        $this->assertEquals('Test exception', $result->getData()->message);
+        $this->assertEquals('Test guard handle log trace exception', $result->getData()->message);
 
         // Check if error was logged with trace
-        $errorLog = ErrorLog::where('message', 'Test exception')->first();
-        $this->assertNotNull($errorLog->trace);
+        $errorLog = ErrorLog::where('message', 'Test guard handle log trace exception');
+        $this->assertNotNull($errorLog->latest()->first()->trace);
+
+        $errorLog->delete();
     }
 
     public function test_guard_handles_exception_with_exception_only_policy()

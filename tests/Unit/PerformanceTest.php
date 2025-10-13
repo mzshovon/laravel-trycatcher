@@ -56,7 +56,7 @@ class PerformanceTest extends TestCase
 
         for ($i = 0; $i < $iterations; $i++) {
             $this->guard->run(
-                fn() => throw new Exception("Test exception $i"),
+                fn() => throw new Exception("Test Guard Performance exception $i"),
                 ExceptionPolicy::LOG
             );
         }
@@ -76,6 +76,8 @@ class PerformanceTest extends TestCase
         echo "Execution Time: " . number_format($executionTime * 1000, 2) . "ms\n";
         echo "Memory Used: " . number_format($memoryUsed / 1024, 2) . "KB\n";
         echo "Average per operation: " . number_format(($executionTime * 1000) / $iterations, 4) . "ms\n";
+
+        ErrorLog::where("message","like","%Test Guard Performance exception%")->delete();
     }
 
     public function test_memory_leak_prevention()
@@ -107,6 +109,8 @@ class PerformanceTest extends TestCase
         echo "Iterations: $iterations\n";
         echo "Memory Growth: " . number_format($memoryGrowth / 1024, 2) . "KB\n";
         echo "Average Growth per 50 iterations: " . number_format($memoryGrowth / count($memorySnapshots) / 1024, 2) . "KB\n";
+
+        ErrorLog::where("message","like","%Memory test exception%")->delete();
     }
 
     public function test_database_performance_with_logging()
@@ -128,14 +132,17 @@ class PerformanceTest extends TestCase
         // Check database performance
         $this->assertLessThan(5.0, $executionTime, "Database logging should complete within 5 seconds for $iterations operations");
 
+        $errorData = ErrorLog::where("message","like","%DB performance test%");
+
         // Verify all records were created
-        $this->assertEquals($iterations, ErrorLog::count());
+        $this->assertEquals($iterations, $errorData->count());
 
         echo "\nDatabase Performance Test Results:\n";
         echo "Iterations: $iterations\n";
         echo "Execution Time: " . number_format($executionTime * 1000, 2) . "ms\n";
         echo "Average per operation: " . number_format(($executionTime * 1000) / $iterations, 4) . "ms\n";
         echo "Records Created: " . ErrorLog::count() . "\n";
+        $errorData->delete();
     }
 
     public function test_concurrent_operations_simulation()
@@ -163,6 +170,8 @@ class PerformanceTest extends TestCase
         echo "Iterations: $iterations\n";
         echo "Execution Time: " . number_format($executionTime * 1000, 2) . "ms\n";
         echo "Average per operation: " . number_format(($executionTime * 1000) / $iterations, 4) . "ms\n";
+
+        ErrorLog::where("message","like","%Concurrent test%")->delete();
     }
 
     public function test_large_context_data_performance()
@@ -200,6 +209,8 @@ class PerformanceTest extends TestCase
         echo "Context Size: " . number_format(strlen(serialize($largeContext)) / 1024, 2) . "KB\n";
         echo "Execution Time: " . number_format($executionTime * 1000, 2) . "ms\n";
         echo "Memory Used: " . number_format($memoryUsed / 1024, 2) . "KB\n";
+
+        ErrorLog::where("message","like","%Large context test%")->delete();
     }
 }
 

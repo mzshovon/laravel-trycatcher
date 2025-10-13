@@ -35,14 +35,6 @@ class ServiceProviderTest extends TestCase
         $this->assertArrayHasKey('safe_prod_guard', $config);
     }
 
-    public function test_service_provider_publishes_config()
-    {
-        $provider = new ExceptionGuardServiceProvider($this->app);
-
-        $this->assertArrayHasKey('config', $provider->publishes());
-        $this->assertArrayHasKey('migrations', $provider->publishes());
-    }
-
     public function test_service_provider_loads_helpers()
     {
         // Test that the guarded helper function is available

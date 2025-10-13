@@ -53,6 +53,8 @@ class ErrorLogTest extends TestCase
 
         $this->assertIsArray($errorLog->context);
         $this->assertEquals(['key' => 'value'], $errorLog->context);
+
+        ErrorLog::where('message', 'Test error message')->delete();
     }
 
     public function test_error_log_uses_has_factory_trait()

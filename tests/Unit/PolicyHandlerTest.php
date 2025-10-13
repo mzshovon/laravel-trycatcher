@@ -29,7 +29,7 @@ class PolicyHandlerTest extends TestCase
 
     public function test_log_with_trace_policy_logs_exception_with_trace()
     {
-        $exception = new Exception('Test exception');
+        $exception = new Exception('Test exception with log trace');
         $handler = new PolicyHandler($exception, ExceptionPolicy::LOG_WITH_TRACE);
 
         $result = $handler->resolvePolicy();
@@ -37,9 +37,10 @@ class PolicyHandlerTest extends TestCase
         $this->assertInstanceOf(Response::class, $result);
         $this->assertTrue($result->getData()->error);
 
-        $errorLog = ErrorLog::where('message', 'Test exception')->first();
-        $this->assertNotNull($errorLog);
-        $this->assertNotNull($errorLog->trace);
+        $errorLog = ErrorLog::where('message', 'Test exception with log trace');
+        $this->assertNotNull($errorLog->latest()->first());
+        $this->assertNotNull($errorLog->latest()->first()->trace);
+        $errorLog->delete();
     }
 
     public function test_exception_only_policy_returns_formatted_response()
@@ -99,7 +100,7 @@ class PolicyHandlerTest extends TestCase
 
     public function test_handler_uses_custom_status_code()
     {
-        $exception = new Exception('Test exception');
+        $exception = new Exception('Test Handler Status exception');
         $handler = new PolicyHandler(
             $exception,
             ExceptionPolicy::LOG,
@@ -109,11 +110,13 @@ class PolicyHandlerTest extends TestCase
         $result = $handler->resolvePolicy();
 
         $this->assertEquals(422, $result->getStatusCode());
+
+        ErrorLog::where('message', 'Test Handler Status exception')->delete();
     }
 
     public function test_handler_uses_custom_context()
     {
-        $exception = new Exception('Test exception');
+        $exception = new Exception('Test Handler exception');
         $handler = new PolicyHandler(
             $exception,
             ExceptionPolicy::LOG,
@@ -122,8 +125,11 @@ class PolicyHandlerTest extends TestCase
 
         $handler->resolvePolicy();
 
-        $errorLog = ErrorLog::where('message', 'Test exception')->first();
-        $this->assertEquals(['user_id' => 123, 'action' => 'test'], $errorLog->context);
+        $errorLog = ErrorLog::where('message', 'Test Handler exception');
+
+        $this->assertEquals(['user_id' => 123, 'action' => 'test'], $errorLog->latest()->first()->context);
+
+        $errorLog->delete();
     }
 
     public function test_handler_fallback_to_file_log_when_db_fails()
@@ -141,6 +147,8 @@ class PolicyHandlerTest extends TestCase
 
         $this->assertInstanceOf(Response::class, $result);
         $this->assertTrue($result->getData()->error);
+
+        ErrorLog::where('message', 'Test exception')->delete();
     }
 }
 
