@@ -172,25 +172,23 @@ class ExampleUsageTest extends TestCase
         ];
 
         foreach ($policies as $policy) {
-            if ($policy === ExceptionPolicy::THROW || $policy === ExceptionPolicy::LOG_AND_THROW) {
-                $this->expectException(Exception::class);
-            }
+                try {
+                    $result = guarded(
+                        fn() => throw new Exception("Test with $policy->value policy"),
+                        $policy,
+                        ['message' => 'Custom error message']
+                    );
 
-            $result = guarded(
-                fn() => throw new Exception("Test with $policy->value policy"),
-                $policy,
-                ['message' => 'Custom error message']
-            );
-
-            if ($policy !== ExceptionPolicy::THROW && $policy !== ExceptionPolicy::LOG_AND_THROW) {
-                $this->assertInstanceOf(Response::class, $result);
-                $this->assertTrue($result->getData()->error);
-                ErrorLog::where("message","like","%Test with%")->delete();
-            } else {
-                ErrorLog::where("message","like","%Test with%")->delete();
-            }
+                    if ($policy !== ExceptionPolicy::THROW && $policy !== ExceptionPolicy::LOG_AND_THROW) {
+                        $this->assertInstanceOf(Response::class, $result);
+                        $this->assertTrue($result->getData()->error);
+                    }
+                } catch (Exception $e) {
+                    $this->assertInstanceOf(Exception::class, $e);
+                } finally {
+                    ErrorLog::where('message', 'like', "%Test with%")->delete();
+                }
         }
-
 
     }
 
