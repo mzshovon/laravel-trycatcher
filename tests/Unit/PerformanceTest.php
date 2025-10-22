@@ -77,7 +77,7 @@ class PerformanceTest extends TestCase
         echo "Memory Used: " . number_format($memoryUsed / 1024, 2) . "KB\n";
         echo "Average per operation: " . number_format(($executionTime * 1000) / $iterations, 4) . "ms\n";
 
-        ErrorLog::where("message","like","%Test Guard Performance exception%")->delete();
+        $this->removeTestErrorLogs("Test Guard Performance exception");
     }
 
     public function test_memory_leak_prevention()
@@ -110,7 +110,7 @@ class PerformanceTest extends TestCase
         echo "Memory Growth: " . number_format($memoryGrowth / 1024, 2) . "KB\n";
         echo "Average Growth per 50 iterations: " . number_format($memoryGrowth / count($memorySnapshots) / 1024, 2) . "KB\n";
 
-        ErrorLog::where("message","like","%Memory test exception%")->delete();
+        $this->removeTestErrorLogs("Memory test exception");
     }
 
     public function test_database_performance_with_logging()
@@ -171,7 +171,7 @@ class PerformanceTest extends TestCase
         echo "Execution Time: " . number_format($executionTime * 1000, 2) . "ms\n";
         echo "Average per operation: " . number_format(($executionTime * 1000) / $iterations, 4) . "ms\n";
 
-        ErrorLog::where("message","like","%Concurrent test%")->delete();
+        $this->removeTestErrorLogs("Concurrent test");
     }
 
     public function test_large_context_data_performance()
@@ -210,7 +210,12 @@ class PerformanceTest extends TestCase
         echo "Execution Time: " . number_format($executionTime * 1000, 2) . "ms\n";
         echo "Memory Used: " . number_format($memoryUsed / 1024, 2) . "KB\n";
 
-        ErrorLog::where("message","like","%Large context test%")->delete();
+        $this->removeTestErrorLogs("Large context test");
+    }
+
+    private function removeTestErrorLogs(string $message)
+    {
+        ErrorLog::where('message', 'like', "%{$message}%")->delete();
     }
 }
 

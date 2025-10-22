@@ -111,7 +111,7 @@ class PolicyHandlerTest extends TestCase
 
         $this->assertEquals(422, $result->getStatusCode());
 
-        ErrorLog::where('message', 'Test Handler Status exception')->delete();
+        $this->removeTestErrorLogs("Test Handler Status exception");
     }
 
     public function test_handler_uses_custom_context()
@@ -148,7 +148,12 @@ class PolicyHandlerTest extends TestCase
         $this->assertInstanceOf(Response::class, $result);
         $this->assertTrue($result->getData()->error);
 
-        ErrorLog::where('message', 'Test exception')->delete();
+        $this->removeTestErrorLogs("Test exception");
+    }
+
+    private function removeTestErrorLogs(string $message)
+    {
+        ErrorLog::where('message', 'like', "%{$message}%")->delete();
     }
 }
 

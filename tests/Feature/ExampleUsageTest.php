@@ -31,7 +31,7 @@ class ExampleUsageTest extends TestCase
             'message' => 'Something went wrong'
         ]);
 
-        ErrorLog::whereMessage("Something went wrong")->delete();
+        $this->removeTestErrorLogs("Something went wrong");
     }
 
     /**
@@ -85,7 +85,7 @@ class ExampleUsageTest extends TestCase
             'level' => 'info'
         ]);
 
-        ErrorLog::whereMessage("Test log entry")->delete();
+        $this->removeTestErrorLogs("Test log entry");
     }
 
     /**
@@ -120,7 +120,7 @@ class ExampleUsageTest extends TestCase
         $this->assertEquals('An error occurred. Please try again.', $data->message);
         $this->assertStringNotContainsString('Sensitive error information', $data->message);
 
-        ErrorLog::whereMessage("Sensitive error information")->delete();
+        $this->removeTestErrorLogs("Sensitive error information");
     }
 
     /**
@@ -132,7 +132,7 @@ class ExampleUsageTest extends TestCase
         $action = 'user_login';
 
         $result = guarded(
-            fn() => throw new Exception('Login failed'),
+            fn() => throw new Exception('Test Login failed'),
             ExceptionPolicy::LOG,
             [
                 'level' => 'warning',
@@ -148,13 +148,13 @@ class ExampleUsageTest extends TestCase
         $this->assertInstanceOf(Response::class, $result);
 
         // Verify context was logged
-        $errorLog = ErrorLog::where('message', 'Login failed')->first();
+        $errorLog = ErrorLog::where('message', 'Test Login failed')->first();
         $this->assertNotNull($errorLog);
         $this->assertEquals('warning', $errorLog->level);
         $this->assertEquals($userId, $errorLog->context['user_id']);
         $this->assertEquals($action, $errorLog->context['action']);
 
-        ErrorLog::whereMessage("Login failed")->delete();
+        $this->removeTestErrorLogs("Test Login failed");
     }
 
     /**
@@ -186,7 +186,7 @@ class ExampleUsageTest extends TestCase
                 } catch (Exception $e) {
                     $this->assertInstanceOf(Exception::class, $e);
                 } finally {
-                    ErrorLog::where('message', 'like', "%Test with%")->delete();
+                    $this->removeTestErrorLogs("Test with");
                 }
         }
 
@@ -216,6 +216,11 @@ class ExampleUsageTest extends TestCase
         );
 
         $this->assertEquals('Facade test successful', $result);
+    }
+
+    private function removeTestErrorLogs(string $message)
+    {
+        ErrorLog::where('message', 'like', "%{$message}%")->delete();
     }
 }
 
