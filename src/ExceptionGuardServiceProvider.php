@@ -32,6 +32,7 @@ class ExceptionGuardServiceProvider extends ServiceProvider
     public function boot()
     {
         $timestamp_part = date('Y_m_d_His');
+
         // publish config and migrations
         $this->publishes([
             __DIR__.'/config/exception-guard.php' => config_path('exception-guard.php'),
