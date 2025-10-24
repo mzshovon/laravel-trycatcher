@@ -31,12 +31,16 @@ class ExceptionGuardServiceProvider extends ServiceProvider
      */
     public function boot()
     {
+        $timestamp_part = date('Y_m_d_His');
         // publish config and migrations
         $this->publishes([
             __DIR__.'/config/exception-guard.php' => config_path('exception-guard.php'),
         ], 'config');
 
-        $this->publishes([__DIR__.'/Migrations/2025_10_01_193656_create_error_logs_table.php' => database_path('migrations')], 'migrations');
+        $this->publishes([
+            __DIR__.'/migrations/2025_10_01_193656_create_error_logs_table.php' =>
+                database_path("migrations/{$timestamp_part}_create_error_logs_table.php")
+            ], 'migrations');
 
         // load helpers
         if (file_exists(__DIR__ . '/Helpers/helpers.php')) {
